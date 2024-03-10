@@ -1,25 +1,34 @@
-'use strict';
-import fs from 'fs';
+'use strict'
 import Bencode from 'bencode';
+import {Buffer} from 'buffer';
 import dgram from 'dgram';
-import { Buffer } from 'buffer';
-import Url from 'url';
+import url from 'url';
+import fs from 'fs';
 
-const urlParse = Url.parse
+const torrentUnitArray = Bencode.decode(fs.readFileSync('puppy.torrent'));
 
-const socket = dgram.createSocket('udp4');
+const torrentDecoded = new TextDecoder('utf-8').decode(torrentUnitArray.announce);
 
-const myMsg = Buffer.from('hello?','utf8');
+const udpMessage = Buffer.from('hello?','utf8');
 
-const torrent = Bencode.decode(fs.readFileSync('puppy.torrent'));
+const torrentUrlObj = url.parse(torrentDecoded);
+const {host,port} = torrentUrlObj;
 
-const url = urlParse(new TextDecoder("utf-8").decode(torrent.announce));
+const udpServerSocket = dgram.createSocket('udp4');
 
-console.log(url)
+udpServerSocket.on('error', (err) => {
+    console.error(`server error:\n${err.stack}`);
+    udpServerSocket.close();
+});
 
- socket.send(myMsg,0,myMsg.length,url.port,url.host, () => {});
+udpServerSocket.send(udpMessage,0,udpMessage.length,port,host, (err) => {
+    if (err) {
+        console.error(`sending message error:\n`,err);
+        process.exit();
+    }
+})
 
- socket.on('message', msg => {
-    console.log('messgae is', msg);
- })
+udpServerSocket.on('message' , (msg) => {
+   console.log(`Incoming message:\n`, msg);
+})
 

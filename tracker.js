@@ -2,7 +2,7 @@
 
 import dgram from 'dgram';
 import {Buffer} from 'buffer';
-import {parse} from 'url';
+import Url from 'url';
 
 module.exports.getPeers = (torrent, callback) => {
     const socket = dgram.createSocket('udp4');
@@ -18,7 +18,7 @@ module.exports.getPeers = (torrent, callback) => {
 }
 
 function udpSend(socket, message, rawUrl, callback = () => {}) {
-    const url = parse(rawUrl);
+    const url = Url.parse(rawUrl);
 }
 
 function buildConnReq() {

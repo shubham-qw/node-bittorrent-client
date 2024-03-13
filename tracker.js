@@ -14,13 +14,37 @@ module.exports.getPeers = (torrent, callback) => {
         url = torrent.announce.toString('utf8');
     }
 
+    // send connect request 
     udpSend(socket,buildConnReq(),url);
+
+    socket.on('message', (response) => {
+        if (respType(response) === 'connect') {
+
+        }
+    })
 }
 
 function udpSend(socket, message, rawUrl, callback = () => {}) {
     const url = Url.parse(rawUrl);
+    socket.send(message, 0, message.length, url.port ,url.host, callback); 
+}
+
+function respType(resp) {
+
 }
 
 function buildConnReq() {
+
+}
+
+function parseConnResp(resp) {
+
+}
+
+function buildAnnounceReq(connId) {
+
+}
+
+function parseAnnounceResp(resp) {
 
 }
